@@ -67,6 +67,81 @@ Rdot = S*R
 
 RPY_T = tr2rpy(trnorm(R+50*1e-3*Rdot))
 
+%% Programming part 3 
 
+clc
+clear
+close all
 
+% DO NOT EDIT THE FOLLOWING LINES
+q = [30 -40 10];  % joint angles in degrees
 
+% YOUR ANSWER BELOW HERE
+
+a1=9;
+a2=3;
+a3=7;
+a4=-3;
+a5=5.1;
+
+q1 = deg2rad(q(1));
+q2 = deg2rad(q(2)); 
+q3 = deg2rad(q(3));
+
+T=trchain2('R(q1) Tx(a1) Ty(a2) R(q2) Tx(a3) R(q3) Ty(a4) Tx(a5)',[q1 q2 q3]);
+
+TM = trot2(q(1), 'deg') * transl2(9.0,3.0) * trot2(q(2), 'deg') * transl2(7.0,0) * trot2(q(3), 'deg') * transl2(5.1,-3);%Equivalent
+
+x = TM(1,3)*1e-2
+y = TM(2,3)*1e-2
+theta = acosd(T(1,1))
+
+%% DH example (not sure if it works
+
+clc
+clear
+close all
+
+q = [30 -40 10];
+
+qrad=q.*pi/180
+
+a1=9*10^(-2)
+a2=7*10^(-2)
+a3=5.1*10^(-2)
+s1 = 3*10^(-2)
+% initial values for DH coordinate system
+q1f=atan(s1/a1)
+q2f=-atan(s1/a1)
+q3f=-(pi/2-atan(a3/s1))
+q4f=(pi/2-atan(a3/s1))
+
+L(1) = Link([0 0 sqrt(a1^2+s1^2) 0]);
+L(2) = Link([0 0 a2 0]);
+L(3) = Link([0 0 sqrt(s1^2+a3^2) 0]);
+L(4) = Link([0 0 0 0]); % only for transforming to a frame beeing perpendicular to end effector
+three_link = SerialLink(L, 'name', 'three link');
+
+three_link.plot
+
+%% Programming part 4 
+
+clc
+clear
+close all
+
+% DO NOT EDIT THE FOLLOWING LINES
+q1 = [-30 20 10 30 40 50];  % joint angles in degrees
+q2 = [30 40 20 10 20 80];   % joint angles in degrees
+        
+% YOUR ANSWER BELOW HERE
+mdl_puma560
+
+p560.base = transl(17.4,12.2,1.3) * trotz(pi/2);
+p560.tool = transl(4.1*1e-2,0.3*1e-2,17.4*1e-2);
+
+qt=jtraj(q1,q2,120); % Define the trajectory 
+
+P70r= p560.fkine(qt(70,:),'deg') % Calculates the transformation matrice @ 70
+
+P70 = P70r(1:3,4)' % Returns only the position
